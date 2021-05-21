@@ -1,18 +1,12 @@
-import {
-    GET_CURRENCIES_FAILURE,
-    GET_CURRENCIES_REQUEST,
-    GET_CURRENCIES_SUCCESS,
-    UPDATE_BASE_CURRENCY,
-} from './converterTypes';
-
+import * as types from './converterTypes';
 import axios from 'axios';
 
 const site = 'http://data.fixer.io/api';
 const accessKey = 'dafb064f846be9beaaca228080750363';
-const currUrl = `${site}/latest?access_key=${accessKey}`;
+export const currUrl = `${site}/latest?access_key=${accessKey}`;
 const convertUrl = `${site}/convert?access_key=${accessKey}`;
 
-export const getCurrencies = () => {
+export function getCurrencies() {
     return (dispatch) => {
         dispatch(getCurrenciesRequest());
         let userBase = '';
@@ -20,7 +14,7 @@ export const getCurrencies = () => {
             userBase = localStorage.getItem('userBase');
         } catch (error) {}
 
-        axios
+        return axios
             .get(currUrl)
             .then(({ data }) => {
                 const result = {
@@ -35,29 +29,29 @@ export const getCurrencies = () => {
                 dispatch(getCurrenciesFailure(error.message));
             });
     };
-};
+}
 
 export const getCurrenciesRequest = () => {
     return {
-        type: GET_CURRENCIES_REQUEST,
+        type: types.GET_CURRENCIES_REQUEST,
     };
 };
 
 export const getCurrenciesSuccess = (data) => {
     return {
-        type: GET_CURRENCIES_SUCCESS,
+        type: types.GET_CURRENCIES_SUCCESS,
         payload: data,
     };
 };
 
 export const getCurrenciesFailure = (error) => {
     return {
-        type: GET_CURRENCIES_FAILURE,
+        type: types.GET_CURRENCIES_FAILURE,
         payload: error,
     };
 };
 
-export const convertMoney = async ({ amount, from, to }, { base, rates }) => {
+export const convertMoney = async ({ amount, from, to }, { rates }) => {
     // https://data.fixer.io/api/convert
     //  ? access_key = API_KEY
     //  & from = GBP
@@ -80,7 +74,7 @@ export const updateBaseCurrency = (currency) => {
     // ? access_key = API_KEY
     // & base = USD
     return {
-        type: UPDATE_BASE_CURRENCY,
+        type: types.UPDATE_BASE_CURRENCY,
         payload: currency,
     };
 };
