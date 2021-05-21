@@ -1,24 +1,42 @@
 import React from 'react';
-import configureStore, { history } from '../redux/configureStore';
-import { Provider } from 'react-redux';
-import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
-import { ConnectedRouter } from 'connected-react-router';
-import ConverterContainer from '../containers/ConverterContainer';
-import NotFound from './NotFound';
+import { Container, Jumbotron, Row, Col } from 'react-bootstrap';
+import Converter from '../containers/Converter';
 
-const store = configureStore();
+export const Header = () => (
+    <header className="mt-3 mb-3">
+        <h1>Convertor of currencies</h1>
+        <p>Enter some expression with currencies at this template and get result.</p>
+    </header>
+);
+
+export const Footer = () => (
+    <footer className="mb-3 mt-3">
+        <p>Courses and base currency are got from http://data.fixer.io/api</p>
+        <p>
+            Realized such operations as convertation from one currence to another and updating base currence that changes the table of courses.
+        </p>
+        <p>All rights reserved. 2021</p>
+    </footer>
+);
+
+export const Main = () => (
+    <main>
+        <Converter />
+    </main>
+);
 
 const App = () => (
-    <Provider store={store}>
-        <ConnectedRouter history={history}>
-            <Router>
-                <Switch>
-                    <Route exact path="/" component={ConverterContainer} />
-                    <Route component={NotFound} />
-                </Switch>
-            </Router>
-        </ConnectedRouter>
-    </Provider>
+    <Jumbotron fluid>
+        <Container>
+            <Row className="justify-content-center">
+                <Col>
+                    <Header />
+                    <Main />
+                    <Footer />
+                </Col>
+            </Row>
+        </Container>
+    </Jumbotron>
 );
 
 export default App;
