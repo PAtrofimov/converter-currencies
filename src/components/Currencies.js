@@ -1,8 +1,90 @@
 import React, { useState } from 'react';
-import { Table, Form } from 'react-bootstrap';
+import { Table, Form, Pagination, InputGroup, ButtonToolbar, ButtonGroup, Button } from 'react-bootstrap';
 
-const Currencies = ({ data, onUpdateBaseCurrency }) => {
+export const Letter = ({ handleLetterClick, value }) => (
+    <Button onClick={handleLetterClick} value={value}>
+        {value}
+    </Button>
+);
+
+export const LettersToolbar = ({ firstLetters, handleLetterClick }) => (
+    <ButtonToolbar>
+        <ButtonGroup className="mr-2" style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {firstLetters.map((el, index) => (
+                <Letter key={String(index)} handleLetterClick={handleLetterClick} value={el} />
+            ))}
+        </ButtonGroup>
+    </ButtonToolbar>
+);
+
+export const CurrenciesRow = ({ name, value }) => (
+    <tr>
+        <td>1 {name}</td>
+        <td>{value}</td>
+    </tr>
+);
+
+export const CurrenciesTable = ({ rates }) => {
+    return (
+        <Table striped bordered hover size="sm">
+            <thead>
+                <tr>
+                    <th>Currency</th>
+                    <th>Course</th>
+                </tr>
+            </thead>
+            <tbody>
+                {rates.map(([key, value]) => (
+                    <CurrenciesRow key={key} name={key} value={value} />
+                ))}
+            </tbody>
+        </Table>
+    );
+};
+
+export const BaseCurrencyInput = ({ baseCur, handleChange, rates }) => (
+    <Form className="mt-3">
+        <Form.Group controlId="base-currency-select">
+            <InputGroup>
+                <InputGroup.Prepend>
+                    <InputGroup.Text>Base currency</InputGroup.Text>
+                </InputGroup.Prepend>
+                <Form.Control as="select" value={baseCur} onChange={handleChange} data-testid = "base-currency">
+                    {[...Object.keys(rates)].sort().map((el) => (
+                        <option key={el} value={el} data-testid = {"currency-option-" + el}>
+                            {el}
+                        </option>
+                    ))}
+                </Form.Control>
+            </InputGroup>
+        </Form.Group>
+    </Form>
+);
+
+export const CurrenciesPagination = ({ numberPages, handleClick }) => {
+    const pageItems = Array(numberPages)
+        .fill(0)
+        .map((el, index) => {
+            const number = index + 1;
+            return (
+                <Pagination.Item key={number} active={index === number} onClick={() => handleClick(number)}>
+                    {number}
+                </Pagination.Item>
+            );
+        });
+
+    return (
+        <div>
+            <Pagination style={{ flexWrap: 'wrap' }}>{pageItems}</Pagination>
+        </div>
+    );
+};
+
+const Currencies = ({ data, convertedRates, firstLetters, onUpdateBaseCurrency }) => {
     const [baseCur, setBaseCur] = useState(data?.userBase);
+    const [currentPage, setСurrentPage] = useState(1);
+    const [letter, setLetter] = useState('');
+
     const handleChange = ({ target }) => {
         const value = target.value;
         if (!value) {
@@ -11,60 +93,26 @@ const Currencies = ({ data, onUpdateBaseCurrency }) => {
         setBaseCur(value);
         onUpdateBaseCurrency(value);
     };
-    let courseUserCur = 1;
 
-    let rates = Object.entries(data.rates);
+    const handleLetterClick = ({ target }) => {
+        const value = target.value;
+        setLetter(value);
+        setСurrentPage(1);
+    };
+    const { numberPages, rates: allRates } = convertedRates[letter];
+    const rates = allRates.length >= currentPage ? allRates[currentPage - 1] : [];
 
-    if (data?.userBase !== data?.base) {
-        const [, value] = rates.find(([key, value]) => key === data?.userBase);
-        courseUserCur = value;
-    }
-
-    rates = rates.map(([key, value]) => {
-        return [key, Math.round(1e10 * (courseUserCur / value)) / 1e10];
-    });
-
-    const result = (
+    return (
         <section>
-            <Form>
-                <Form.Group controlId="base-currency-select">
-                    <Form.Label>Base currency</Form.Label>
-                    <Form.Control as="select" value={baseCur} onChange={handleChange}>
-                        {[...Object.keys(data.rates)].sort().map((el) => {
-                            return (
-                                <option key={el} value={el}>
-                                    {el}
-                                </option>
-                            );
-                        })}
-                    </Form.Control>
-                </Form.Group>
-            </Form>
-            <p>The table of courses on base currency is actual on {data?.date ?? Date.now().toLocaleDateString()}.</p>
-            <Table striped bordered hover size="sm">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Currency</th>
-                        <th>Course</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {rates.map(([key, value], index) => {
-                        return (
-                            <tr key={key}>
-                                <td>{index + 1}</td>
-                                <td>1 {key}</td>
-                                <td>{value}</td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </Table>
+            <BaseCurrencyInput rates={data.rates} baseCur={baseCur} handleChange={handleChange} />
+            <h3>
+                The table of courses to {baseCur} is actual on {data?.date ?? new Date().toLocaleDateString()}.
+            </h3>
+            <LettersToolbar firstLetters={firstLetters} handleLetterClick={handleLetterClick} />
+            <CurrenciesTable rates={rates} />
+            {numberPages > 1 && <CurrenciesPagination numberPages={numberPages} handleClick={setСurrentPage} />}
         </section>
     );
-
-    return result;
 };
 
 export default Currencies;
