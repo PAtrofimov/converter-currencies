@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { Table, Form, Pagination, InputGroup, ButtonToolbar, ButtonGroup, Button } from 'react-bootstrap';
 
 export const Letter = ({ handleLetterClick, value }) => (
-    <Button onClick={handleLetterClick} value={value}>
+    <Button
+        onClick={handleLetterClick}
+        value={value}
+        style={{ flex: '0 1 auto', background: 'lightgrey', color: 'black', borderColor: 'grey', fontWeight: '500' }}
+    >
         {value}
     </Button>
 );
@@ -26,7 +30,13 @@ export const CurrenciesRow = ({ name, value }) => (
 
 export const CurrenciesTable = ({ rates }) => {
     return (
-        <Table striped bordered hover size="sm">
+        <Table
+            striped
+            bordered
+            hover
+            size="sm"
+            style={{ textAlign: 'center', margin: '0 auto', maxWidth: '500px' }}
+        >
             <thead>
                 <tr>
                     <th>Currency</th>
@@ -49,9 +59,15 @@ export const BaseCurrencyInput = ({ baseCur, handleChange, rates }) => (
                 <InputGroup.Prepend>
                     <InputGroup.Text>Base currency</InputGroup.Text>
                 </InputGroup.Prepend>
-                <Form.Control as="select" value={baseCur} onChange={handleChange} data-testid = "base-currency">
+                <Form.Control
+                    as="select"
+                    value={baseCur}
+                    onChange={handleChange}
+                    data-testid="base-currency"
+                    style={{ maxWidth: '100px' }}
+                >
                     {[...Object.keys(rates)].sort().map((el) => (
-                        <option key={el} value={el} data-testid = {"currency-option-" + el}>
+                        <option key={el} value={el} data-testid={'currency-option-' + el}>
                             {el}
                         </option>
                     ))}
@@ -74,8 +90,8 @@ export const CurrenciesPagination = ({ numberPages, handleClick }) => {
         });
 
     return (
-        <div>
-            <Pagination style={{ flexWrap: 'wrap' }}>{pageItems}</Pagination>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Pagination>{pageItems}</Pagination>
         </div>
     );
 };
@@ -105,7 +121,7 @@ const Currencies = ({ data, convertedRates, firstLetters, onUpdateBaseCurrency }
     return (
         <section>
             <BaseCurrencyInput rates={data.rates} baseCur={baseCur} handleChange={handleChange} />
-            <h3>
+            <h3 style={{ textAlign: 'center' }}>
                 The table of courses to {baseCur} is actual on {data?.date ?? new Date().toLocaleDateString()}.
             </h3>
             <LettersToolbar firstLetters={firstLetters} handleLetterClick={handleLetterClick} />

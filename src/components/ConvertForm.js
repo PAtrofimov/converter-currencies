@@ -30,6 +30,7 @@ const ConvertForm = ({ data }) => {
 
     const result = (
         <section>
+             <p>Enter some expression with currencies at this template and get result.</p>
              <InputGroup className="mb-3">
                 <FormControl type="text" placeholder="150 USD in UAH" value={text} onChange={handleChange} data-testid = "convert-input" />
                 <InputGroup.Append>
